@@ -15,14 +15,45 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  email     String @unique
+  id        Int          @id @default(autoincrement())
+  email     String       @unique
   firstName String
   lastName  String
   password  String
+  teams     TeamMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+model Team {
+  id           Int          @id @default(autoincrement())
+  name         String
+  descritption String?
+  members      TeamMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TeamMember {
+  id     Int            @id @default(autoincrement())
+  userId Int
+  teamId Int
+  role   TeamMemberRole @default(MEMBER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([userId, teamId])
+}
+
+enum TeamMemberRole {
+  LEADER
+  MEMBER
 }
